@@ -1,0 +1,202 @@
+% Wishlist:
+%
+%  * make list of figures to "bildnachweis"
+%  * a bibliography per article (if article needs one)
+%  * page number in footer with orange ellipse
+
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{pmag2}
+              [2007/11/06 Style for Piratenmagazin]
+
+\RequirePackage{pmaggfx}
+\RequirePackage{fancyhdr}
+\RequirePackage{extramarks}
+\RequirePackage{tocloft}
+\RequirePackage[labelformat=empty]{caption}
+\RequirePackage{ifthen}
+\RequirePackage{wallpaper}
+\RequirePackage{sectsty}
+
+
+% Customize fonts of (sub)section titles
+\allsectionsfont{\normalfont\itshape\sffamily}
+\sectionfont{\normalfont\itshape\sffamily\Huge}
+\subsectionfont{\normalfont\itshape\sffamily\Large{\color{\porange}\rule[1pt]{3mm}{3mm}} }
+
+
+
+% Reduce free space at the top of the page:
+\renewcommand{\topmargin}{0mm}
+
+
+% Pagestyles (defining headers and footers)
+
+% Pagestyle for 'regular' pages
+% header: orange ellipse with short form of the article title
+% footer: small orange ellipse with page number (TODO!!!)
+\fancypagestyle{article}{%
+  \fancyhf{}
+  \fancyhead[RO]{\bigrightellipse{\itshape\sffamily\rightmark}}
+  \fancyhead[LE]{\bigleftellipse{\itshape\sffamily\rightmark}}
+  \fancyfoot[RO,LE]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+%%   \addtolength{\headheight}{\baselineskip}
+%%   \addtolength{\headheight}{\baselineskip}
+%%   \addtolength{\headheight}{\baselineskip}
+}
+
+
+% Pagestyle for pages where a new article starts
+% As 'article' page style, but with a huge centered article title 
+% plus a small centerd subtitle 
+\fancypagestyle{newarticle}{%
+  \fancyhf{}
+  \fancyhead[RO]{\bigrightellipse{\itshape\sffamily\rightmark}}
+  \fancyhead[LE]{\bigleftellipse{\itshape\sffamily\rightmark}}
+  \fancyhead[CO,CE]{\Huge\itshape\sffamily\leftmark\\\normalsize\firstleftxmark}
+  \fancyfoot[RO,LE]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+  \addtolength{\headheight}{\baselineskip}
+  \addtolength{\headheight}{\baselineskip}
+  \addtolength{\headheight}{\baselineskip}
+  \fancyheadoffset[RO]{-\oddsidemargin}
+  \fancyheadoffset[LE]{\evensidemargin}
+}
+
+
+% Pagestyle for plain pages
+% orange ellipse in header only (no text)
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyhead[RO]{\bigrightellipse{}}
+  \fancyhead[LE]{\bigleftellipse{}}
+  \fancyfoot[RO,LE]{\thepage} %%%%%%%%%%%%%%%%%%%%%%%
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+%%   \addtolength{\headheight}{\baselineskip}
+%%   \addtolength{\headheight}{\baselineskip}
+%%   \addtolength{\headheight}{\baselineskip}
+}
+
+\pagestyle{article}
+
+% Command wich defines the beginning of a new article
+% Use this instead of \section commands
+% Parameters;
+% 1: Short form of article title
+% 2: Long form of article title
+% 3: Subtitle
+\newcommand{\article}[3]{%
+  \clearpage
+  \thispagestyle{newarticle}
+  \refstepcounter{section}
+  \markboth{#2}{#1}
+  \extramarks{#3}{#3}
+  \addcontentsline{toc}{section}{#2}
+}
+
+
+% No section numbering:
+\setcounter{secnumdepth}{0}
+
+
+% Configure table of contents
+
+% Only sections in table of contents:
+\setcounter{tocdepth}{1}
+
+\renewcommand{\contentsname}{Inhalt}
+\renewcommand{\cfttoctitlefont}{\Huge\itshape\sffamily}
+\renewcommand{\cftsecfont}{\itshape\sffamily}
+\renewcommand{\cftsecpagefont}{\itshape\sffamily}
+\renewcommand{\cftdot}{\color{\porange}\rule[2pt]{2pt}{2pt}}
+\renewcommand{\cftsecdotsep}{2}
+\addtolength{\cftaftertoctitleskip}{\baselineskip}
+%\tocloftpagestyle{article}
+
+% Configure list of fitures
+
+\renewcommand{\cftloftitlefont}{\Huge\itshape\sffamily}
+\renewcommand{\cftfigfont}{\itshape\sffamily}
+\renewcommand{\cftfigpagefont}{\itshape\sffamily}
+\addtolength{\cftafterloftitleskip}{\baselineskip}
+
+\renewenvironment{titlepage}
+  {%
+    \onecolumn
+    \thispagestyle{empty}%
+    \setcounter{page}\@ne
+  }%
+  {
+    \newpage \thispagestyle{empty}\null
+    \newpage \thispagestyle{empty}\null
+    \twocolumn
+    \setcounter{page}\@ne
+  }
+
+% Command for defining the title image:
+\newif\if@havetitleimage \@havetitleimagefalse
+\newcommand{\titleimage}[1]{\def\@titleimage{#1}\@havetitleimagetrue}
+
+% The title page (is just an image):
+\renewcommand\maketitle{\begin{titlepage}%
+  \if@havetitleimage
+    \ThisTileWallPaper{\paperwidth}{\paperheight}{\@titleimage}
+  \else
+     \PackageError{pmag}{No title image specified}%
+       {Please use \protect\titleimage  to specify the titleimage.}
+  \fi
+  \end{titlepage}%
+  \global\let\maketitle\relax
+}
+
+
+
+% Stuff for setting the first page with contents and foreword
+
+\newcommand{\forwordname}{Präambel}
+
+\newenvironment{firstpage}{%
+  \clearpage
+  \onecolumn
+  \hspace{-2cm}
+  \begin{minipage}{6cm}
+    \tableofcontents
+  \end{minipage}
+  \hfill
+  \begin{minipage}{9cm}
+  \section*{\forwordname}
+    \itshape
+}
+{%
+  \end{minipage}
+  \twocolumn
+  %\setcounter{page}\@ne
+}
+
+
+% We use marks for footers and headers a bit differently, don't let
+% sections and subsections interfere with that
+\renewcommand{\sectionmark}[1]{}
+\renewcommand{\subsectionmark}[1]{}
+
+
+\renewcommand{\refname}{Quellen}
+
+% Index as Autorenverzeichnis
+\renewcommand{\indexname}{Autorenverzeichnis}
+
+\renewenvironment{theindex}
+               {\@restonecolfalse
+                \article{\indexname}{\indexname}{}%
+                \twocolumn%
+                \itshape\sffamily%
+                \parindent\z@
+                \parskip\z@ \@plus .3\p@\relax
+                \columnseprule \z@
+                \columnsep 35\p@
+                \let\item\@idxitem}
+               {\if@restonecol\onecolumn\else\clearpage\fi}

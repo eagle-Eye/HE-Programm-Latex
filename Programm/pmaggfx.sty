@@ -1,0 +1,130 @@
+
+\ProvidesPackage{pmaggfx}
+\RequirePackage{color}
+\RequirePackage{pgf}
+
+\newcommand\porange{red!50!white!60!yellow}
+\newcommand\pblue{blue!15!white}
+
+
+\newenvironment{infobox}[2][tbp]{%
+    \begin{figure}[#1]
+      \roundedbox{#2}{\columnwidth}{\pblue}}
+    {\endroundedbox\end{figure} }
+
+\newenvironment{biginfobox}[2][tbp]{%
+    \begin{figure*}[#1]
+      \roundedbox{#2}{\textwidth}{\pblue}}
+    {\endroundedbox\end{figure*} }
+
+\newcommand\bigrightellipse[1]{%
+  \begin{pgfpicture}{0cm}{0cm}{0cm}{0cm}%
+    \color{\porange}
+    \pgfmoveto{\pgfxy(4, 1)}
+    \pgfcurveto{\pgfxy(2, 1)}{\pgfxy(-1, 1)}{\pgfxy(-5, 5)}
+    \pgflineto{\pgfxy(4, 5)}
+    \pgflineto{\pgfxy(4, 1)}
+    \pgffill
+    \color{black}
+    \pgfputat{\pgfxy(2, 2.5)}{\pgfbox[right, top]{#1}}
+  \end{pgfpicture}}
+
+\newcommand\bigleftellipse[1]{%
+  \begin{pgfpicture}{0cm}{0cm}{0cm}{0cm}%
+    \color{\porange}
+    \pgfmoveto{\pgfxy(-4, 1)}
+    \pgfcurveto{\pgfxy(-2, 1)}{\pgfxy(1, 1)}{\pgfxy(5, 5)}
+    \pgflineto{\pgfxy(-4, 5)}
+    \pgflineto{\pgfxy(-4, 1)}
+    \pgffill
+    \color{black}
+    \pgfputat{\pgfxy(-2, 2.5)}{\pgfbox[left, top]{#1}}
+  \end{pgfpicture}}
+
+
+\newbox\infb@box
+\newbox\infb@colorbox
+\newdimen\infb@width
+\newdimen\infb@temp
+\newdimen\infb@dima
+\newdimen\infb@dimb
+\newdimen\infb@prevheight
+
+\newcommand\roundedbox[3]{%
+  \infb@width=#2
+  \vbox\bgroup
+    \setbox\infb@box=\hbox{%
+      \begin{minipage}[h]{\infb@width}%
+	\vspace{4bp}
+	{\itshape\sffamily\large#1}\\%
+    \end{minipage}}%
+
+    \wd\infb@box=\infb@width%
+    \infb@temp=\dp\infb@box%
+    \ifdim\infb@temp<1.5pt%
+      \infb@temp=1.5pt%
+    \fi%
+    \setbox\infb@box=\hbox{\raise\infb@temp\hbox{\box\infb@box}}%
+    \dp\infb@box=0pt%
+    \infb@prevheight=\ht\infb@box%
+
+    \infb@temp=\infb@width%
+    \infb@dima=\infb@temp\advance\infb@dima by2.2bp%
+    \infb@dimb=\infb@temp\advance\infb@dimb by4bp%
+
+  \hbox{%
+    \begin{pgfpicture}{0bp}{+-\ht\infb@box}{0bp}{+-\ht\infb@box}
+      \color{#3}%
+      \pgfpathqmoveto{-4bp}{-1bp}
+      \pgfpathqcurveto{-4bp}{1.2bp}{-2.2bp}{3bp}{0bp}{3bp}
+      \pgfpathlineto{\pgfpoint{\infb@temp}{3bp}}
+      \pgfpathcurveto%
+      {\pgfpoint{\infb@dima}{3bp}}%
+      {\pgfpoint{\infb@dimb}{1.2bp}}%
+      {\pgfpoint{\infb@dimb}{-1bp}}%
+      \infb@dima=-\ht\infb@box%
+      \advance\infb@dima by-2pt%
+      \pgfpathlineto{\pgfpoint{\infb@dimb}{\infb@dima}}
+      \pgfpathlineto{\pgfpoint{-4bp}{\infb@dima}}
+      \pgfusepath{fill}
+    \end{pgfpicture}%
+    \copy\infb@box%
+  }
+
+  \nointerlineskip%
+  \setbox\infb@colorbox=\hbox{\pgfsetcolor{#3}}%
+  \setbox\infb@box=\hbox\bgroup\begin{minipage}[b]{\infb@width}%
+}
+
+\def\endroundedbox{%
+  \end{minipage}\egroup
+  \wd\infb@box=\infb@width%
+  \infb@temp=\dp\infb@box%
+  \advance\infb@temp by.5pt%
+  \setbox\infb@box=\hbox{\raise\infb@temp\hbox{\box\infb@box}}%
+  \dp\infb@box=0pt%
+  \infb@temp=\wd\infb@box%
+  \infb@dima=\infb@temp\advance\infb@dima by2.2bp%
+  \infb@dimb=\infb@temp\advance\infb@dimb by4bp% %
+  \hbox{%
+    \begin{pgfpicture}{0bp}{0bp}{0bp}{0bp}
+      \unhbox\infb@colorbox%
+      \pgfpathqmoveto{-4bp}{1bp}
+      \pgfpathqcurveto{-4bp}{-1.2bp}{-2.2bp}{-3bp}{0bp}{-3bp}
+      \pgfpathlineto{\pgfpoint{\the\infb@temp}{-3bp}}
+      \pgfpathcurveto%
+      {\pgfpoint{\the\infb@dima}{-3bp}}%
+      {\pgfpoint{\the\infb@dimb}{-1.2bp}}%
+      {\pgfpoint{\the\infb@dimb}{1bp}}%
+      {
+      \infb@dima=\ht\infb@box%
+      \pgfpathlineto{\pgfpoint{\infb@dimb}{\infb@dima}}
+      \pgfpathlineto{\pgfpoint{-4bp}{\infb@dima}}
+      \pgfusepath{fill}
+      }
+    \end{pgfpicture}%
+    \box\infb@box%
+  }%
+  \egroup
+}
+
